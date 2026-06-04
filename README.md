@@ -24,12 +24,3 @@ Sesuai dengan instruksi tugas yang diberikan untuk mengembangkan fungsionalitas 
 * Mengubah komponen `TextField` bawaan modul menjadi `TextFormField` dan membungkusnya ke dalam widget `Form` yang dikendalikan oleh `GlobalKey<FormState>`.
 * **Validator Username:** Menambahkan sistem pengecekan agar kolom username tidak boleh dikosongkan saat menekan tombol login.
 * **Validator Password:** Menambahkan logika validasi ganda, yaitu memastikan kolom password tidak boleh kosong dan **wajib diisi minimal sebanyak 6 karakter**. Jika kriteria ini tidak terpenuhi, sistem akan menampilkan pesan peringatan error berwarna merah dan menahan proses login.
-
----
-
-## 🚀 Cara Menjalankan Proyek
-
-1. Pastikan SDK Flutter sudah terpasang di komputer Anda.
-2. Klona (*clone*) repositori ini:
-   ```bash
-   git clone [https://github.com/Rommy003/pertemuan10_2306019.git](https://github.com/Rommy003/pertemuan10_2306019.git)
