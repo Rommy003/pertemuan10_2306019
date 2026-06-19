@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> { 
+class _MyAppState extends State<MyApp> {
   bool isLogin = false;
   bool isLoading = true;
 
@@ -23,7 +23,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     checkLogin();
   }
-
 
   Future<void> checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
@@ -35,20 +34,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
- 
     if (isLoading) {
-      return const MaterialApp( 
-        home: Scaffold( 
-          body: Center( 
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(
             child: CircularProgressIndicator(),
           ),
         ),
       );
     }
-
-    
     return MaterialApp(
-      debugShowCheckedModeBanner: false, 
+      debugShowCheckedModeBanner: false,
       home: isLogin ? const HomePage() : const LoginPage(),
     );
   }
