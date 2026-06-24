@@ -5,6 +5,9 @@ import '../widgets/product_card.dart';
 import 'login_page.dart';
 import 'product_page.dart';
 import 'product_detail_page.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String username = '';
+  String username = "";
+
+  //variabel utama dari daftar produk
   List<ProductModel> products = [];
   int totalProducts = 0;
 
@@ -25,68 +30,62 @@ class _HomePageState extends State<HomePage> {
     loadProducts();
   }
 
-  Future<void> getUser() async {
+  Future<void> loadProducts() async {
     final prefs = await SharedPreferences.getInstance();
+    List<String> productsList = prefs.getStringList('products') ?? [];
     setState(() {
-      username = prefs.getString('username') ?? '';
+      totalProducts = productsList.length;
+      products = productsList
+      .reversed
+      .take(3)
+      .map((item)=>ProductModel.fromJson(item))
+      .toList();
     });
   }
 
-  Future<void> loadProducts() async {
+  Future<void> getUser() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> productList = prefs.getStringList('products') ?? [];
-    totalProducts = productList.length;
     setState(() {
-      products = productList
-          .reversed
-          .take(3)
-          .map((item) => ProductModel.fromJson(item))
-          .toList();
+      username = prefs.getString("username") ?? "";
     });
   }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    }
+    if (!mounted) return;
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: 100,
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                height: 120,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color.fromARGB(255, 249, 250, 250),
+                  borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: Colors.black.withAlpha(25),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 28,
-                      backgroundImage: NetworkImage(
-                        "https://picsum.photos/id/64/4326/2884",
-                      ),
+                      backgroundColor: Colors.teal,
+                      backgroundImage: const NetworkImage("https://picsum.photos/seed/picsum/450/300"),
                     ),
                     const SizedBox(width: 15),
                     Expanded(
@@ -95,51 +94,54 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Hai, Selamat Datang!",
+                            "hii,selamat datang $username",
                             style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 4),
                           Row(
                             children: [
                               Text(
                                 username,
-                                style: const TextStyle(
-                                  fontSize: 22,
+                                style: TextStyle(
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
                                 ),
                               ),
                               const SizedBox(width: 6),
                               const Icon(
                                 Icons.verified,
                                 color: Colors.blue,
-                                size: 20,
+                                size: 18,
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: logout,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 8,
+                    Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            await logout();
+                          },
+                          icon: const Icon(Icons.logout, color: Colors.red),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.logout,
-                          size: 28,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
+                          ),
+                        )
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -148,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Total Produk: ${totalProducts.toString()}",
+                    "Total Produk : ${totalProducts.toString()}",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   TextButton(
@@ -158,30 +160,25 @@ class _HomePageState extends State<HomePage> {
                         MaterialPageRoute(
                           builder: (context) => const ProductPage(),
                         ),
-                      ).then((_) => loadProducts()); // Memuat ulang produk setelah kembali
+                      ).then((_) => loadProducts()); // Refresh setelah kembali
                     },
                     child: const Text("Lihat selengkapnya"),
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
               Expanded(
-                child: ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return ProductCard(
-                      product: product,
-                      onTap: () {
-                         Navigator.push(
-                           context,
-                           MaterialPageRoute(
-                             builder: (context) => ProductDetailPage(product: product),
-                           ),
-                         );
-                      },
-                    );
-                  },
-                ),
+                child: products.isEmpty
+                    ? const Center(child: Text("Belum ada produk"))
+                    : ListView.builder(
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return ProductCard(
+                            product: product,
+                          );
+                        },
+                      ),
               ),
             ],
           ),

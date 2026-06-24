@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product_model.dart';
+import 'dart:convert';
 
 class ProductDetailPage extends StatelessWidget {
   final ProductModel product;
@@ -9,12 +10,23 @@ class ProductDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Detail Produk")),
+      appBar: AppBar(title: const Text("Detail Produk"),
+      backgroundColor: Colors.teal,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            product.image.isNotEmpty
+                ? Image.memory(
+                    base64Decode(product.image),
+                    width: double.infinity,
+                    height: 250,
+                    fit: BoxFit.cover,
+                  )
+                : const Icon(Icons.image, size: 250),
+            const SizedBox(height: 20),
             Text(
               product.name,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
